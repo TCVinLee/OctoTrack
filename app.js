@@ -13,7 +13,8 @@ const AVAILABLE_PLANS = [
   "SILVER-24-12-31",
   "SILVER-25-04-11",
   "SILVER-25-04-15",
-  "SILVER-25-09-02"
+  "SILVER-25-09-02",
+  "SILVER-26-04-01"
 ];
 
 const state = {

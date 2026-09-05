@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Oct Track tariff companion for daily electricity and gas unit rates.">
+    <title>Oct Track</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" aria-label="Application header">
+        <div></div>
+        <button class="icon-button menu-trigger" id="menuButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menuPopover">
+          <i data-lucide="menu" aria-hidden="true"></i>
+          <span>Menu</span>
+        </button>
+      </header>
+
+      <div class="menu-scrim hidden" id="menuScrim"></div>
+      <nav class="menu-popover hidden" id="menuPopover" aria-label="Application menu">
+        <button type="button" id="openSettings">
+          <i data-lucide="settings" aria-hidden="true"></i>
+          <span>Settings</span>
+        </button>
+        <button type="button" id="openDisclaimer">
+          <i data-lucide="info" aria-hidden="true"></i>
+          <span>Disclaimer</span>
+        </button>
+        <a href="https://tcvinlee.github.io/iOS_tracking_octo_public/privacy.html" target="_blank" rel="noopener noreferrer">
+          <i data-lucide="shield-lock" aria-hidden="true"></i>
+          <span>Privacy Policy</span>
+        </a>
+      </nav>
+
+      <main class="content">
+        <section class="brand-block" aria-labelledby="appTitle">
+          <h1 id="appTitle">Oct Track</h1>
+          <p>Your independent Oct Track tariff companion - Live rates, updated daily</p>
+        </section>
+
+        <section class="status-stack" aria-live="polite">
+          <div class="loading hidden" id="loadingState">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Gathering today's rates...</span>
+          </div>
+          <div class="error-box hidden" id="electricityError"></div>
+          <div class="error-box hidden" id="gasError"></div>
+        </section>
+
+        <section class="setup-message hidden" id="setupMessage">
+          <p>Let's get you set up!</p>
+          <p>Please go to menu at the top right corner and enter your postcode and tariff plan.</p>
+        </section>
+
+        <section class="cards hidden" id="rateDashboard" aria-label="Tariff dashboard">
+          <article class="card plan-card">
+            <h2 id="planName">Plan Code</h2>
+            <p><i data-lucide="map-pin" aria-hidden="true"></i><span id="postcodeDisplay">Postcode:</span></p>
+          </article>
+
+          <article class="card energy-card electricity">
+            <h2><i data-lucide="zap" aria-hidden="true"></i><span>Electricity Tariff</span></h2>
+            <div class="rate-line today">
+              <span>Today:</span>
+              <strong id="electricityToday">--</strong>
+              <small>p/kWh</small>
+            </div>
+            <p class="missing hidden" id="electricityTodayMissing">Today's price: Not available</p>
+            <div class="rate-line tomorrow">
+              <span>Tomorrow:</span>
+              <strong id="electricityTomorrow">--</strong>
+              <small>p/kWh</small>
+            </div>
+            <p class="missing hidden" id="electricityTomorrowMissing">Tomorrow's price not available yet.<br>Check back soon!</p>
+          </article>
+
+          <article class="card energy-card gas">
+            <h2><i data-lucide="flame" aria-hidden="true"></i><span>Gas Tariff</span></h2>
+            <div class="rate-line today">
+              <span>Today:</span>
+              <strong id="gasToday">--</strong>
+              <small>p/kWh</small>
+            </div>
+            <p class="missing hidden" id="gasTodayMissing">Today's price: Not available</p>
+            <div class="rate-line tomorrow">
+              <span>Tomorrow:</span>
+              <strong id="gasTomorrow">--</strong>
+              <small>p/kWh</small>
+            </div>
+            <p class="missing hidden" id="gasTomorrowMissing">Tomorrow's price not available yet.<br>Check back soon!</p>
+          </article>
+
+          <article class="card action-card">
+            <button class="primary-button" id="refreshButton" type="button">
+              <i data-lucide="refresh-cw" aria-hidden="true"></i>
+              <span>Refresh</span>
+            </button>
+          </article>
+        </section>
+      </main>
+
+      <footer class="ad-shell" id="adShell" aria-label="Advertising placeholder">
+        <span>Advertisement</span>
+      </footer>
+    </div>
+
+    <dialog class="modal" id="settingsDialog" aria-labelledby="settingsTitle">
+      <form method="dialog" class="modal-panel settings-panel" id="settingsForm">
+        <button class="modal-close" value="cancel" aria-label="Close settings" type="submit">
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+        <div class="modal-heading">
+          <span class="modal-icon"><i data-lucide="settings" aria-hidden="true"></i></span>
+          <h2 id="settingsTitle">Settings</h2>
+        </div>
+
+        <label class="field">
+          <span>Postcode</span>
+          <input id="postcodeInput" name="postcode" autocomplete="postal-code" placeholder="Enter postcode">
+        </label>
+        <p class="field-error hidden" id="postcodeError">Invalid postcode. Please enter a valid UK postcode.</p>
+
+        <label class="field">
+          <span>Tariff Plan</span>
+          <select id="planSelect" name="plan"></select>
+        </label>
+
+        <button class="save-button" type="submit" value="default" id="saveSettings">
+          <i data-lucide="badge-check" aria-hidden="true"></i>
+          <span>Save</span>
+        </button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="disclaimerDialog" aria-labelledby="disclaimerTitle">
+      <form method="dialog" class="modal-panel disclaimer-panel">
+        <button class="modal-close" value="cancel" aria-label="Close disclaimer" type="submit">
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+        <h2 id="disclaimerTitle">Disclaimer</h2>
+        <p>This application, 'Oct Track', is independently developed and is not affiliated with, endorsed by, or associated with any energy provider.</p>
+        <p>'Oct Track' is designed as a general energy tariff tracker and does not use any third-party logos, trademarks, or proprietary branding. All tariff information is retrieved from publicly available sources and is provided for general reference only.</p>
+        <p>This app is intended solely as an independent tracker for energy tariffs. Users should always refer to their official energy provider's website or application for the most accurate and up-to-date information.</p>
+        <p>The developer of 'Oct Track' accepts no responsibility or liability for any loss, damage, or inconvenience caused by reliance on this application. Use of this app is at your own risk.</p>
+      </form>
+    </dialog>
+  </body>
+</html>

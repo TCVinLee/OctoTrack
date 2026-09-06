@@ -318,11 +318,11 @@ iOS:
 
 Static web:
 
-- Includes a fixed 50 px advertising placeholder to preserve layout.
-- Actual web ad network integration should be added separately if required.
+ Google ad/banner integration is not included in the root web app.
+ Buy me a coffee is rendered at the bottom of the application menu.
 
-### Disclaimer and Privacy
-
+ The bottom area does not reserve space for a Google banner ad.
+ Support is available from the Buy me a coffee action in the application menu.
 Disclaimer text must state that the app is independently developed, not affiliated with or endorsed by an energy provider, uses public sources for reference only, and accepts no liability for reliance.
 
 Privacy policy opens:
@@ -472,6 +472,32 @@ function fetchTariff(type, postcode, plan):
 - Background refresh requires iOS entitlements and permitted task identifiers; those are not represented in a static web deployment.
 - Browser notifications on GitHub Pages require HTTPS, user permission, and active browser support.
 - Public API access depends on Octopus Energy CORS behavior for browser clients.
+
+## 10.1 Root web UI parity update
+
+The root static web app was updated to match the visual language and relevant functionality implemented in `oct_track_v2`. The implementation spans `index.html`, `app.js`, and `styles.css`.
+
+The web presentation now follows the v2 design tokens and component treatment:
+
+- `#181836` background with a warm translucent top glow and magenta/teal title gradient.
+- Frosted translucent surfaces with backdrop blur, white overlay, continuous `24px` corners, and accent strokes.
+- Blue electricity cards, purple gas cards, green today rates, orange tomorrow rates, and magenta primary actions.
+- Matching menu popover border treatment, modal backdrop, settings fields, focus states, and responsive spacing.
+- A v2-style dashboard composition with a brand kicker, live-status badge, current-plan identity card, energy grid, setup action, and rate refresh action.
+
+The DOM hooks used by the data and API logic were preserved. Existing API endpoints, tariff extraction, notification behavior, postcode validation, supported plans, dialogs, and the privacy-policy destination remain available.
+
+The web implementation now also includes:
+
+- `showGas` preference in `localStorage`, with a Settings toggle that conditionally renders and fetches the Gas tariff.
+- `historyDays` preference with 7-day and 14-day options. Electricity history uses the standard-unit-rates endpoint with `period_from` and `period_to` query parameters.
+- An interactive Chart.js history chart with the electricity tariff and Flexible Octopus reference line.
+- Flexible Octopus lookup using product `VAR-22-11-01`, region-specific electricity tariff code, and `DIRECT_DEBIT` filtering.
+- Current electricity versus Flexible comparison, expressed as cheaper, more expensive, or matching with a percentage difference.
+- Today versus Tomorrow trend indicators for electricity and gas.
+- Removal of Google ad/banner placeholders. The Buy me a coffee script is now rendered as the final item in the application menu.
+
+The web version cannot guarantee iOS-style background refresh after the browser is closed, but all new foreground fetches and interactions are implemented in JavaScript.
 
 ## 11. Acceptance Checklist
 

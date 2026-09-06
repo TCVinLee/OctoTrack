@@ -7,12 +7,13 @@
     <title>Oct Track</title>
     <link rel="stylesheet" href="./styles.css">
     <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script defer src="./app.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script defer src="./app.js?v=20260906-c"></script>
   </head>
   <body>
-    <div class="app-shell">
+    <div class="app-shell" id="appShell">
       <header class="topbar" aria-label="Application header">
-        <div></div>
+        <div class="topbar-brand" aria-hidden="true"><span></span><span></span><span></span></div>
         <button class="icon-button menu-trigger" id="menuButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menuPopover">
           <i data-lucide="menu" aria-hidden="true"></i>
           <span>Menu</span>
@@ -33,10 +34,15 @@
           <i data-lucide="shield-lock" aria-hidden="true"></i>
           <span>Privacy Policy</span>
         </a>
+        <div class="menu-support">
+          <span class="menu-support-label">Support Oct Track</span>
+          <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="YqC9wOTzA" data-color="#FFDD00" data-emoji="" data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
+        </div>
       </nav>
 
       <main class="content">
         <section class="brand-block" aria-labelledby="appTitle">
+          <p class="brand-kicker">INDEPENDENT TARIFF COMPANION</p>
           <h1 id="appTitle">Oct Track</h1>
           <p>Your independent Oct Track tariff companion - Live rates, updated daily</p>
         </section>
@@ -50,61 +56,105 @@
           <div class="error-box hidden" id="gasError"></div>
         </section>
 
-        <section class="setup-message hidden" id="setupMessage">
-          <p>Let's get you set up!</p>
-          <p>Please go to menu at the top right corner and enter your postcode and tariff plan.</p>
+        <section class="setup-message hidden" id="setupMessage" aria-labelledby="setupTitle">
+          <span class="setup-icon"><i data-lucide="sparkles" aria-hidden="true"></i></span>
+          <p id="setupTitle">Let's get you set up!</p>
+          <p>Please go to settings and enter your postcode and tariff plan.</p>
+          <button class="secondary-button" id="setupSettingsButton" type="button">
+            <i data-lucide="settings-2" aria-hidden="true"></i>
+            <span>Open Settings</span>
+          </button>
         </section>
 
-        <section class="cards hidden" id="rateDashboard" aria-label="Tariff dashboard">
+        <section class="dashboard hidden" id="rateDashboard" aria-label="Tariff dashboard">
+          <div class="dashboard-heading">
+            <div>
+              <p class="section-kicker">TODAY'S OVERVIEW</p>
+              <h2>Live tariff rates</h2>
+            </div>
+            <span class="live-badge"><span></span> Live</span>
+          </div>
+
           <article class="card plan-card">
-            <h2 id="planName">Plan Code</h2>
-            <p><i data-lucide="map-pin" aria-hidden="true"></i><span id="postcodeDisplay">Postcode:</span></p>
+            <div class="plan-mark"><i data-lucide="layers-3" aria-hidden="true"></i></div>
+            <div>
+              <p class="card-eyebrow">CURRENT PLAN</p>
+              <h2 id="planName">Plan Code</h2>
+              <p class="plan-location"><i data-lucide="map-pin" aria-hidden="true"></i><span id="postcodeDisplay">Postcode:</span></p>
+            </div>
           </article>
 
-          <article class="card energy-card electricity">
-            <h2><i data-lucide="zap" aria-hidden="true"></i><span>Electricity Tariff</span></h2>
-            <div class="rate-line today">
-              <span>Today:</span>
-              <strong id="electricityToday">--</strong>
-              <small>p/kWh</small>
+          <div class="energy-grid">
+            <article class="card energy-card electricity">
+              <div class="energy-heading">
+                <span class="energy-icon"><i data-lucide="zap" aria-hidden="true"></i></span>
+                <div><p class="card-eyebrow">ENERGY</p><h2>Electricity Tariff</h2></div>
+              </div>
+              <div class="rate-line today"><span>Today:</span><strong id="electricityToday">--</strong><small>p/kWh</small></div>
+              <p class="missing hidden" id="electricityTodayMissing">Today's price: Not available</p>
+              <div class="rate-line tomorrow"><span>Tomorrow:</span><strong id="electricityTomorrow">--</strong><small>p/kWh</small></div>
+              <p class="rate-trend hidden" id="electricityTrend"></p>
+              <p class="missing hidden" id="electricityTomorrowMissing">Tomorrow's price not available yet.<br>Check back soon!</p>
+            </article>
+
+            <article class="card energy-card gas" id="gasCard">
+              <div class="energy-heading">
+                <span class="energy-icon"><i data-lucide="flame" aria-hidden="true"></i></span>
+                <div><p class="card-eyebrow">ENERGY</p><h2>Gas Tariff</h2></div>
+              </div>
+              <div class="rate-line today"><span>Today:</span><strong id="gasToday">--</strong><small>p/kWh</small></div>
+              <p class="missing hidden" id="gasTodayMissing">Today's price: Not available</p>
+              <div class="rate-line tomorrow"><span>Tomorrow:</span><strong id="gasTomorrow">--</strong><small>p/kWh</small></div>
+              <p class="rate-trend hidden" id="gasTrend"></p>
+              <p class="missing hidden" id="gasTomorrowMissing">Tomorrow's price not available yet.<br>Check back soon!</p>
+            </article>
+          </div>
+
+          <article class="card comparison-card" id="flexibleComparisonCard">
+            <div class="section-heading-row">
+              <div>
+                <p class="card-eyebrow">FLEXIBLE OCTOPUS</p>
+                <h2>Flexible price comparison</h2>
+              </div>
+              <span class="comparison-icon"><i data-lucide="scale" aria-hidden="true"></i></span>
             </div>
-            <p class="missing hidden" id="electricityTodayMissing">Today's price: Not available</p>
-            <div class="rate-line tomorrow">
-              <span>Tomorrow:</span>
-              <strong id="electricityTomorrow">--</strong>
-              <small>p/kWh</small>
+            <div class="comparison-values">
+              <div><span>Your tariff</span><strong id="currentElectricityRate">--</strong><small>p/kWh</small></div>
+              <div><span>Flexible</span><strong id="flexibleRate">--</strong><small>p/kWh</small></div>
             </div>
-            <p class="missing hidden" id="electricityTomorrowMissing">Tomorrow's price not available yet.<br>Check back soon!</p>
+            <p class="comparison-result" id="flexibleComparisonResult">Flexible price comparison unavailable.</p>
           </article>
 
-          <article class="card energy-card gas">
-            <h2><i data-lucide="flame" aria-hidden="true"></i><span>Gas Tariff</span></h2>
-            <div class="rate-line today">
-              <span>Today:</span>
-              <strong id="gasToday">--</strong>
-              <small>p/kWh</small>
+          <section class="history-section" aria-labelledby="historyTitle">
+            <div class="section-heading-row history-heading">
+              <div>
+                <p class="section-kicker">ELECTRICITY HISTORY</p>
+                <h2 id="historyTitle">Price trend</h2>
+              </div>
+              <div class="history-switch" role="group" aria-label="History period">
+                <button type="button" class="history-option active" data-days="7">7 days</button>
+                <button type="button" class="history-option" data-days="14">14 days</button>
+              </div>
             </div>
-            <p class="missing hidden" id="gasTodayMissing">Today's price: Not available</p>
-            <div class="rate-line tomorrow">
-              <span>Tomorrow:</span>
-              <strong id="gasTomorrow">--</strong>
-              <small>p/kWh</small>
-            </div>
-            <p class="missing hidden" id="gasTomorrowMissing">Tomorrow's price not available yet.<br>Check back soon!</p>
-          </article>
+            <p class="history-caption" id="historyCaption">Past 7 days</p>
+            <article class="card chart-card">
+              <div class="chart-status hidden" id="historyLoading">Loading price history...</div>
+              <div class="chart-status hidden" id="historyEmpty">No historic data available.</div>
+              <div class="chart-wrap"><canvas id="historyChart" aria-label="Electricity price history chart"></canvas></div>
+              <div class="chart-legend"><span class="legend-current"></span><span>Electricity tariff</span><span class="legend-flexible"></span><span>Flexible Octopus</span></div>
+            </article>
+          </section>
 
           <article class="card action-card">
             <button class="primary-button" id="refreshButton" type="button">
               <i data-lucide="refresh-cw" aria-hidden="true"></i>
-              <span>Refresh</span>
+              <span>Refresh rates</span>
             </button>
+            <p>Rates are sourced from the public Octopus Energy API.</p>
           </article>
         </section>
       </main>
 
-      <footer class="support-shell" aria-label="Support Oct Track">
-        <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="YqC9wOTzA" data-color="#FFDD00" data-emoji="" data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
-      </footer>
     </div>
 
     <dialog class="modal" id="settingsDialog" aria-labelledby="settingsTitle">
@@ -127,6 +177,15 @@
           <span>Tariff Plan</span>
           <select id="planSelect" name="plan"></select>
         </label>
+
+        <div class="field setting-toggle-field">
+          <span>Show Gas Tariff</span>
+          <label class="toggle-control">
+            <input id="showGasInput" type="checkbox" checked>
+            <span class="toggle-track" aria-hidden="true"><span></span></span>
+            <span class="toggle-label" id="showGasLabel">Display Gas tariff</span>
+          </label>
+        </div>
 
         <button class="save-button" type="submit" value="default" id="saveSettings">
           <i data-lucide="badge-check" aria-hidden="true"></i>
